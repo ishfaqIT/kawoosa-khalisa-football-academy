@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Lock, Mail } from 'lucide-react';
 import useAcademyStore from '../../store/useAcademyStore';
+import API from '../../api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -18,14 +19,9 @@ const Login = () => {
     setError(null);
 
     try {
-      // Connect to the Auth route
-      const response = await fetch('http://localhost:5000/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
+      // Connect to the Auth route using the configured API instance
+      const { data } = await API.post('/auth/login', { email, password });
 
-      const data = await response.json();
 
       if (data.success) {
         login(data.user, data.token);
