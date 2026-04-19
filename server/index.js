@@ -70,21 +70,22 @@ app.get('/', (req, res) => {
   res.send('KKFA API is running...');
 });
 
-// Sync Database & Start Server
-const PORT = process.env.PORT || 5000;
-
-const startServer = async () => {
-  await connectDB();
-  
-  // In development, sync models
-  if (process.env.NODE_ENV === 'development') {
-    await sequelize.sync({ alter: true });
+// Sync Database (Vercel Serverless environments might not need full sync on every request)
+connectDB();
+if (process.env.NODE_ENV === 'development') {
+  sequelize.sync({ alter: true }).then(() => {
     console.log('✅ Database models synced.');
-  }
+  }).catch(err => console.error('Error syncing models', err));
+}
 
+// Start Server locally
+const PORT = process.env.PORT || 5000;
+if (require.main === module) {
   app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
   });
-};
+}
 
-startServer();
+// Export for Vercel Serverless Functions
+module.exports = app;
+
