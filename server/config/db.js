@@ -32,10 +32,10 @@ const sequelize = process.env.POSTGRES_URL
 const connectDB = async () => {
   try {
     await sequelize.authenticate();
-    console.log('✅ MySQL Database connected successfully.');
+    console.log('✅ Database connected successfully.');
   } catch (error) {
-    console.error('❌ Unable to connect to the database:', error);
-    process.exit(1);
+    console.error('❌ Unable to connect to the database:', error.message);
+    // process.exit(1); // Do not exit in serverless environments like Vercel
   }
 };
 
