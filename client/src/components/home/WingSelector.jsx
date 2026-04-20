@@ -12,8 +12,8 @@ const WingSelector = () => {
   const { activeWing, setActiveWing } = useAcademyStore();
 
   return (
-    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '3rem 0' }}>
-      <div className="glass-effect" style={{ padding: '0.5rem', display: 'flex', gap: '0.5rem', borderRadius: '4rem' }}>
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', padding: '3rem 1rem' }}>
+      <div className="glass-effect" style={{ padding: '0.5rem', display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '0.5rem', borderRadius: '2rem' }}>
         {wings.map((wing) => (
           <button
             key={wing.id}

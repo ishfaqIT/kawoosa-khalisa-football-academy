@@ -52,7 +52,7 @@ const About = () => {
 
       {/* Origin Story */}
       <section style={{ padding: '6rem 0' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '4rem', alignItems: 'center' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 400px), 1fr))', gap: '4rem', alignItems: 'center' }}>
           <motion.div 
             initial="hidden"
             whileInView="visible"
@@ -85,7 +85,7 @@ const About = () => {
 
       {/* Mission Vision Values */}
       <section style={{ padding: '6rem 0', background: 'rgba(255,255,255,0.02)' }}>
-        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '3rem' }}>
+        <div className="container" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '3rem' }}>
           {[
             { title: "MISSION", icon: Target, text: "To identify and nurture football talent using global best practices and modern training methodologies." },
             { title: "VISION", icon: Eye, text: "To become the premier football institute in India, producing world-class athletes for international stages." },
@@ -113,7 +113,7 @@ const About = () => {
           <h2 style={{ fontSize: '3rem', fontWeight: 900, textAlign: 'center', marginBottom: '4rem', textTransform: 'uppercase' }}>
             ACADEMY <span className="text-gradient">WINGS</span>
           </h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
             {/* Kawoosa Wing */}
             <div className="premium-card" style={{ padding: '3rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>

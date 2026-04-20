@@ -5,7 +5,7 @@ import { PlayCircle, Zap, Shield, TrendingUp } from 'lucide-react';
 const Highlights = () => {
   return (
     <section style={{ padding: '8rem 0' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '4rem', alignItems: 'center' }}>
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '4rem', alignItems: 'center', padding: '0 1rem' }}>
         <motion.div
           initial={{ opacity: 0, x: -50 }}
           whileInView={{ opacity: 1, x: 0 }}
@@ -21,7 +21,7 @@ const Highlights = () => {
             Our academy utilizes cutting-edge tactical training and individual skill development to prepare players for the highest level of competition. From core basics to advanced field positioning, we cover it all.
           </p>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1.5rem' }}>
             <div style={{ display: 'flex', gap: '1rem' }}>
               <div style={{ color: 'var(--primary)', padding: '0.5rem' }}><Zap size={24} /></div>
               <div>
@@ -119,8 +119,8 @@ const Highlights = () => {
           {/* Floating Stats */}
           <div style={{ 
             position: 'absolute', 
-            bottom: '-2rem', 
-            right: '2rem',
+            bottom: '-1rem', 
+            right: '1rem',
             background: 'var(--bg-card)',
             backdropFilter: 'blur(10px)',
             padding: '1.5rem',

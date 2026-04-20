@@ -95,7 +95,7 @@ const Players = () => {
             <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem', color: 'var(--primary)', letterSpacing: '0.1em' }}>
               KAWOOSA WING
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               <AnimatePresence mode="popLayout">
                 {filteredPlayers.filter(p => (p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')).includes('Kawoosa')).map((player) => (
                   <PlayerCard key={player.id} player={player} />
@@ -111,7 +111,7 @@ const Players = () => {
             <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem', color: 'white', letterSpacing: '0.1em' }}>
               KUNZER WING
             </h2>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               <AnimatePresence mode="popLayout">
                 {filteredPlayers.filter(p => (p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')).includes('Kunzer')).map((player) => (
                   <PlayerCard key={player.id} player={player} />

@@ -23,10 +23,11 @@ const Partners = () => {
 
       <div style={{ 
         display: 'grid', 
-        gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', 
+        gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 220px), 1fr))', 
         gap: '1.5rem',
         maxWidth: '1200px',
-        margin: '0 auto'
+        margin: '0 auto',
+        padding: '0 1.5rem'
       }}>
         {partners.map((partner, index) => (
           <motion.div

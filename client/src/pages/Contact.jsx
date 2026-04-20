@@ -52,7 +52,7 @@ const Contact = () => {
           </p>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'minmax(0, 1fr) minmax(0, 1fr)', gap: '4rem', alignItems: 'flex-start', marginBottom: '6rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 350px), 1fr))', gap: '4rem', alignItems: 'flex-start', marginBottom: '6rem' }}>
            {/* Contact Form */}
            <motion.div
              initial={{ opacity: 0, x: -20 }}

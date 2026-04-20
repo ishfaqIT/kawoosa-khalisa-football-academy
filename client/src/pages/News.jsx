@@ -11,7 +11,7 @@ const NewsCard = ({ article, isFeatured = false }) => (
     className="premium-card"
     style={{ padding: 0, display: 'flex', flexDirection: isFeatured ? 'row' : 'column', flexWrap: 'wrap' }}
   >
-    <div style={{ flex: isFeatured ? '1 1 50%' : 'none', height: isFeatured ? 'auto' : '16rem', position: 'relative', overflow: 'hidden', minHeight: isFeatured ? '300px' : 'auto' }}>
+    <div style={{ flex: isFeatured ? '1 1 300px' : 'none', height: isFeatured ? 'auto' : '16rem', position: 'relative', overflow: 'hidden', minHeight: isFeatured ? '300px' : 'auto' }}>
       <img
         src={article.image_url || 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&q=80&w=800'}
         alt={article.title}
@@ -20,7 +20,7 @@ const NewsCard = ({ article, isFeatured = false }) => (
         onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}
       />
     </div>
-    <div style={{ flex: isFeatured ? '1 1 50%' : 'none', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    <div style={{ flex: isFeatured ? '1 1 300px' : 'none', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', fontSize: '0.65rem', fontWeight: 700, color: 'var(--text-dim)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '1rem' }}>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><Clock size={12} color="var(--primary)" /> {new Date(article.createdAt).toLocaleDateString()}</span>
         <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}><User size={12} color="var(--primary)" /> {article.author}</span>
@@ -74,7 +74,7 @@ const News = () => {
             )}
             {/* Grid */}
             {articles.length > 1 && (
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '2rem' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
                 {articles.slice(1).map(a => <NewsCard key={a.id} article={a} />)}
               </div>
             )}

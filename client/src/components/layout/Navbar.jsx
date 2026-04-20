@@ -91,7 +91,9 @@ const Navbar = () => {
               borderBottom: '1px solid var(--border-light)',
               display: 'flex',
               flexDirection: 'column',
-              gap: '1.5rem'
+              gap: '1.5rem',
+              maxHeight: 'calc(100vh - 80px)',
+              overflowY: 'auto'
             }}
           >
             {navLinks.map((link) => (

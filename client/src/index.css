@@ -83,6 +83,12 @@ img {
   padding: 0 2rem;
 }
 
+@media (max-width: 768px) {
+  .container {
+    padding: 0 1rem;
+  }
+}
+
 .flex-center {
   display: flex;
   align-items: center;
@@ -91,7 +97,7 @@ img {
 
 .grid-auto-fit {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
   gap: 2rem;
 }
 
@@ -174,6 +180,17 @@ img {
 .reveal.active {
   opacity: 1;
   transform: translateY(0);
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 30s linear infinite;
 }
 
 /* Scrollbar */
@@ -295,7 +312,7 @@ img {
 }
 
 .stat-value {
-  font-size: 4rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
   font-family: 'Outfit', sans-serif;
   font-weight: 900;
   line-height: 1;
