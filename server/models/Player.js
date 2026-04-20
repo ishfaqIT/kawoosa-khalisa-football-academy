@@ -1,51 +1,19 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+const mongoose = require('mongoose');
 
-const Player = sequelize.define('Player', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  dob: {
-    type: DataTypes.DATEONLY,
-  },
-  gender: {
-    type: DataTypes.STRING,
-    defaultValue: 'Male'
-  },
-  wing_id: {
-    type: DataTypes.INTEGER,
-  },
-  position: {
-    type: DataTypes.STRING,
-  },
-  photo_url: {
-    type: DataTypes.STRING,
-  },
-  jersey_no: {
-    type: DataTypes.INTEGER,
-  },
-  status: {
-    type: DataTypes.STRING, // Active, Inactive, Trial
-    defaultValue: 'Active'
-  },
-  bio: {
-    type: DataTypes.TEXT,
-  },
-  school: {
-    type: DataTypes.STRING,
-  },
-  parent_contact: {
-    type: DataTypes.STRING,
-  }
+const playerSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  dob: { type: Date },
+  gender: { type: String, default: 'Male' },
+  wing_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Wing', default: null },
+  position: { type: String },
+  photo_url: { type: String },
+  jersey_no: { type: Number },
+  status: { type: String, default: 'Active' },
+  bio: { type: String },
+  school: { type: String },
+  parent_contact: { type: String }
 }, {
-  timestamps: true,
-  tableName: 'players'
+  timestamps: true
 });
 
-module.exports = Player;
+module.exports = mongoose.model('Player', playerSchema);

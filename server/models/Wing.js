@@ -1,32 +1,13 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+const mongoose = require('mongoose');
 
-const Wing = sequelize.define('Wing', {
-  id: {
-    type: DataTypes.INTEGER,
-    autoIncrement: true,
-    primaryKey: true
-  },
-  name: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  ground: {
-    type: DataTypes.STRING,
-  },
-  founded: {
-    type: DataTypes.INTEGER,
-  },
-  description: {
-    type: DataTypes.TEXT,
-  },
-  color_accent: {
-    type: DataTypes.STRING,
-    defaultValue: '#00FF87'
-  }
+const wingSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  ground: { type: String },
+  founded: { type: Number },
+  description: { type: String },
+  color_accent: { type: String, default: '#00FF87' }
 }, {
-  timestamps: true,
-  tableName: 'wings'
+  timestamps: true
 });
 
-module.exports = Wing;
+module.exports = mongoose.model('Wing', wingSchema);

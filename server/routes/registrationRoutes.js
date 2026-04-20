@@ -2,14 +2,12 @@ const express = require('express');
 const router = express.Router();
 const Registration = require('../models/Registration');
 const Player = require('../models/Player');
-const Wing = require('../models/Wing');
 
 router.get('/', async (req, res) => {
   try {
-    const regs = await Registration.findAll({
-      include: [{ model: Wing, attributes: ['name'] }],
-      order: [['createdAt', 'DESC']]
-    });
+    const regs = await Registration.find()
+      .populate('wing_id', 'name')
+      .sort({ createdAt: -1 });
     res.json({ success: true, data: regs });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
@@ -24,18 +22,20 @@ router.post('/', async (req, res) => {
 // Update status — auto-create Player on Approve, auto-delete on Reject
 router.put('/:id', async (req, res) => {
   try {
-    const reg = await Registration.findByPk(req.params.id);
+    const reg = await Registration.findById(req.params.id);
     if (!reg) return res.status(404).json({ success: false, error: 'Registration not found' });
 
     const previousStatus = reg.status;
-    await reg.update(req.body);
+    
+    Object.assign(reg, req.body);
+    await reg.save();
 
     const newStatus = req.body.status;
 
     // ✅ APPROVED: create a player record from registration data
     if (newStatus === 'Approved' && previousStatus !== 'Approved') {
       const alreadyExists = await Player.findOne({
-        where: { name: reg.player_name, wing_id: reg.wing_id }
+        name: reg.player_name, wing_id: reg.wing_id
       });
 
       if (!alreadyExists) {
@@ -53,8 +53,8 @@ router.put('/:id', async (req, res) => {
 
     // ❌ REJECTED: remove the player if they were previously approved
     if (newStatus === 'Rejected' && previousStatus === 'Approved') {
-      await Player.destroy({
-        where: { name: reg.player_name, wing_id: reg.wing_id }
+      await Player.findOneAndDelete({
+        name: reg.player_name, wing_id: reg.wing_id
       });
     }
 
@@ -67,7 +67,7 @@ router.put('/:id', async (req, res) => {
 
 router.delete('/:id', async (req, res) => {
   try {
-    await Registration.destroy({ where: { id: req.params.id } });
+    await Registration.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Deleted' });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });

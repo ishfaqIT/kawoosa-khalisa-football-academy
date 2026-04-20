@@ -1,28 +1,11 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+const mongoose = require('mongoose');
 
-const Gallery = sequelize.define('Gallery', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  title: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  },
-  image_url: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  category: {
-    type: DataTypes.STRING(100),
-    allowNull: true,
-    defaultValue: 'General'
-  }
+const gallerySchema = new mongoose.Schema({
+  title: { type: String },
+  image_url: { type: String, required: true },
+  category: { type: String, default: 'General' }
 }, {
-  timestamps: true,
-  tableName: 'galleries'
+  timestamps: true
 });
 
-module.exports = Gallery;
+module.exports = mongoose.model('Gallery', gallerySchema);

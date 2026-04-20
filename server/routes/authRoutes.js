@@ -7,7 +7,7 @@ const User = require('../models/User');
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ where: { email } });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
@@ -19,7 +19,7 @@ router.post('/login', async (req, res) => {
 
     const payload = {
       user: {
-        id: user.id,
+        id: user._id,
         role: user.role,
         name: user.name
       }

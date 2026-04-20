@@ -4,7 +4,7 @@ const News = require('../models/News');
 
 router.get('/', async (req, res) => {
   try {
-    const news = await News.findAll({ order: [['createdAt', 'DESC']] });
+    const news = await News.find().sort({ createdAt: -1 });
     res.json({ success: true, data: news });
   } catch (err) { res.status(500).json({ success: false, error: 'Server Error' }); }
 });
@@ -18,18 +18,16 @@ router.post('/', async (req, res) => {
 
 router.put('/:id', async (req, res) => {
   try {
-    await News.update(req.body, { where: { id: req.params.id } });
-    const item = await News.findByPk(req.params.id);
+    const item = await News.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json({ success: true, data: item });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
 router.delete('/:id', async (req, res) => {
   try {
-    await News.destroy({ where: { id: req.params.id } });
+    await News.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Deleted' });
   } catch (err) { res.status(500).json({ success: false, error: err.message }); }
 });
 
 module.exports = router;
-

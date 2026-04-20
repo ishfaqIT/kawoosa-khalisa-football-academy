@@ -1,47 +1,16 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+const mongoose = require('mongoose');
 
-const Fixture = sequelize.define('Fixture', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  home_team: {
-    type: DataTypes.STRING(150),
-    allowNull: false
-  },
-  away_team: {
-    type: DataTypes.STRING(150),
-    allowNull: false
-  },
-  match_date: {
-    type: DataTypes.DATE,
-    allowNull: false
-  },
-  location: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  competition: {
-    type: DataTypes.STRING(150),
-    allowNull: true
-  },
-  status: {
-    type: DataTypes.ENUM('Upcoming', 'Completed', 'Postponed', 'Cancelled'),
-    defaultValue: 'Upcoming'
-  },
-  home_score: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  },
-  away_score: {
-    type: DataTypes.INTEGER,
-    allowNull: true
-  }
+const fixtureSchema = new mongoose.Schema({
+  home_team: { type: String, required: true },
+  away_team: { type: String, required: true },
+  match_date: { type: Date, required: true },
+  location: { type: String, required: true },
+  competition: { type: String },
+  status: { type: String, enum: ['Upcoming', 'Completed', 'Postponed', 'Cancelled'], default: 'Upcoming' },
+  home_score: { type: Number },
+  away_score: { type: Number }
 }, {
-  timestamps: true,
-  tableName: 'fixtures'
+  timestamps: true
 });
 
-module.exports = Fixture;
+module.exports = mongoose.model('Fixture', fixtureSchema);

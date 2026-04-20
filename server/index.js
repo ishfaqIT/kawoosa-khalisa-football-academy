@@ -6,28 +6,7 @@ const path = require('path');
 const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
-const { connectDB, sequelize } = require('./config/db');
-
-// Models
-const User = require('./models/User');
-const Wing = require('./models/Wing');
-const Coach = require('./models/Coach');
-const Player = require('./models/Player');
-const News = require('./models/News');
-const Event = require('./models/Event');
-const Fixture = require('./models/Fixture');
-const Registration = require('./models/Registration');
-const Gallery = require('./models/Gallery');
-
-// Associations
-Wing.hasMany(Coach, { foreignKey: 'wing_id' });
-Coach.belongsTo(Wing, { foreignKey: 'wing_id' });
-
-Wing.hasMany(Player, { foreignKey: 'wing_id' });
-Player.belongsTo(Wing, { foreignKey: 'wing_id' });
-
-Wing.hasMany(Registration, { foreignKey: 'wing_id' });
-Registration.belongsTo(Wing, { foreignKey: 'wing_id' });
+const { connectDB } = require('./config/db');
 
 const app = express();
 
@@ -43,8 +22,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Rate Limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // limit each IP to 100 requests per windowMs
+  windowMs: 15 * 60 * 1000,
+  max: 100
 });
 app.use('/api/', limiter);
 
@@ -70,13 +49,8 @@ app.get('/', (req, res) => {
   res.send('KKFA API is running...');
 });
 
-// Sync Database (Vercel Serverless environments might not need full sync on every request)
+// Connect Database
 connectDB();
-if (process.env.NODE_ENV === 'development') {
-  sequelize.sync({ alter: true }).then(() => {
-    console.log('✅ Database models synced.');
-  }).catch(err => console.error('Error syncing models', err));
-}
 
 // Start Server locally
 const PORT = process.env.PORT || 5000;
@@ -88,4 +62,3 @@ if (require.main === module) {
 
 // Export for Vercel Serverless Functions
 module.exports = app;
-

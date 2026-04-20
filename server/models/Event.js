@@ -1,39 +1,14 @@
-const { DataTypes } = require('sequelize');
-const { sequelize } = require('../config/db');
+const mongoose = require('mongoose');
 
-const Event = sequelize.define('Event', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true
-  },
-  title: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  description: {
-    type: DataTypes.TEXT,
-    allowNull: false
-  },
-  event_date: {
-    type: DataTypes.DATE,
-    allowNull: false
-  },
-  location: {
-    type: DataTypes.STRING(255),
-    allowNull: false
-  },
-  image_url: {
-    type: DataTypes.STRING(255),
-    allowNull: true
-  },
-  type: {
-    type: DataTypes.ENUM('Training', 'Match', 'Trial', 'Meeting', 'Other'),
-    defaultValue: 'Other'
-  }
+const eventSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  event_date: { type: Date, required: true },
+  location: { type: String, required: true },
+  image_url: { type: String },
+  type: { type: String, enum: ['Training', 'Match', 'Trial', 'Meeting', 'Other'], default: 'Other' }
 }, {
-  timestamps: true,
-  tableName: 'events'
+  timestamps: true
 });
 
-module.exports = Event;
+module.exports = mongoose.model('Event', eventSchema);
