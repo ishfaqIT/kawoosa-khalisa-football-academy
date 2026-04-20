@@ -14,7 +14,7 @@ const Home = () => {
     <div style={{ backgroundColor: 'var(--bg-deep)', minHeight: '100vh' }}>
       <Hero />
 
-      <div className="container" style={{ padding: '0 2rem' }}>
+      <div className="container">
         <div style={{ marginTop: '4rem' }}>
           <WingSelector />
         </div>
@@ -56,7 +56,7 @@ const Home = () => {
               background: 'linear-gradient(135deg, rgba(57, 255, 20, 0.1) 0%, rgba(10, 31, 68, 0.9) 100%)',
               border: '1px solid var(--primary-glow)',
               borderRadius: '3rem',
-              padding: '6rem 4rem',
+              padding: 'clamp(3rem, 10vw, 6rem) clamp(1.5rem, 5vw, 4rem)',
               textAlign: 'center',
               position: 'relative',
               overflow: 'hidden'
