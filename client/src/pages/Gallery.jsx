@@ -47,7 +47,7 @@ const Gallery = () => {
         ) : (
           <div style={{ columns: '3 250px', gap: '1rem' }}>
             {filtered.map(img => (
-              <motion.div key={img.id} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
+              <motion.div key={img._id} initial={{ opacity: 0 }} whileInView={{ opacity: 1 }} viewport={{ once: true }}
                 style={{ marginBottom: '1rem', breakInside: 'avoid', position: 'relative', overflow: 'hidden', borderRadius: '12px', cursor: 'pointer', border: '1px solid var(--border-light)' }}
                 onClick={() => setSelected(img)}>
                 <img src={img.image_url} alt={img.title} style={{ width: '100%', display: 'block', transition: 'transform 0.5s ease' }}

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Award } from 'lucide-react';
-import { fetchCoaches } from '../api';
+import { fetchCoaches, fetchWings } from '../api';
 
 const CoachCard = ({ coach }) => (
   <motion.div
@@ -24,7 +24,7 @@ const CoachCard = ({ coach }) => (
       {/* Wing badge */}
       <div style={{ position: 'absolute', top: '1rem', left: '1rem' }}>
         <span style={{ padding: '0.25rem 0.7rem', background: 'var(--primary)', color: 'var(--bg-deep)', fontSize: '0.6rem', fontWeight: 800, textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '4px' }}>
-          {coach.Wing?.name?.split(' ')[0] || 'KKFA'}
+          {coach.wing_id?.name?.split(' ')[0] || 'KKFA'}
         </span>
       </div>
       {coach.is_active && (
@@ -48,9 +48,9 @@ const CoachCard = ({ coach }) => (
             <Award size={12} color="var(--primary)" /> {coach.experience_yrs} yrs exp
           </span>
         )}
-        {coach.Wing?.name && (
+        {coach.wing_id?.name && (
           <span style={{ display: 'flex', alignItems: 'center', gap: '0.3rem' }}>
-            <MapPin size={12} color="var(--primary)" /> {coach.Wing.name}
+            <MapPin size={12} color="var(--primary)" /> {coach.wing_id.name}
           </span>
         )}
       </div>
@@ -66,19 +66,31 @@ const CoachCard = ({ coach }) => (
 
 const Coaches = () => {
   const [coaches, setCoaches] = useState([]);
+  const [wings, setWings] = useState(['All']);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
 
   useEffect(() => {
-    fetchCoaches()
-      .then(({ data }) => setCoaches(data.data || []))
-      .catch(() => {})
-      .finally(() => setLoading(false));
+    const getData = async () => {
+      try {
+        const [coachesRes, wingsRes] = await Promise.all([
+          fetchCoaches(),
+          fetchWings()
+        ]);
+        setCoaches(coachesRes.data.data || []);
+        if (wingsRes.data.success) {
+           const wingNames = wingsRes.data.data.map(w => w.name.split(' ')[0]);
+           setWings(['All', ...new Set(wingNames)]);
+        }
+      } catch {} finally {
+        setLoading(false);
+      }
+    };
+    getData();
   }, []);
 
-  const wings = ['All', 'Kawoosa', 'Kunzer'];
   const filtered = filter === 'All' ? coaches : coaches.filter(c =>
-    c.Wing?.name?.toLowerCase().includes(filter.toLowerCase())
+    c.wing_id?.name?.toLowerCase().includes(filter.toLowerCase())
   );
 
   return (
@@ -108,7 +120,7 @@ const Coaches = () => {
           <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '4rem 0' }}>No coaches found.</p>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '2rem' }}>
-            {filtered.map(c => <CoachCard key={c.id} coach={c} />)}
+            {filtered.map(c => <CoachCard key={c._id} coach={c} />)}
           </div>
         )}
       </div>

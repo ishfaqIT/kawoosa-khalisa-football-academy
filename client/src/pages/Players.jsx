@@ -2,32 +2,45 @@ import React, { useState, useEffect } from 'react';
 import PlayerCard from '../components/players/PlayerCard';
 import { Search } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { fetchPlayers } from '../api';
+import { fetchPlayers, fetchWings } from '../api';
 
 const Players = () => {
   const [players, setPlayers] = useState([]);
+  const [wings, setWings] = useState(['All']);
   const [searchTerm, setSearchTerm] = useState('');
   const [activeWing, setActiveWing] = useState('All');
   const [activePosition, setActivePosition] = useState('All');
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const getPlayers = async () => {
+    const getData = async () => {
       try {
-        const { data } = await fetchPlayers();
-        setPlayers(data.data);
+        const [playersRes, wingsRes] = await Promise.all([
+          fetchPlayers(),
+          fetchWings()
+        ]);
+        setPlayers(playersRes.data.data || []);
+        if (wingsRes.data.success) {
+          const wingNames = wingsRes.data.data.map(w => w.name.split(' ')[0]);
+          setWings(['All', ...new Set(wingNames)]);
+        }
       } catch (error) {
-        console.error('Error fetching players:', error);
+        console.error('Error fetching data:', error);
       } finally {
         setLoading(false);
       }
     };
-    getPlayers();
+    getData();
   }, []);
+
+  const getWingName = (p) => {
+    if (p.wing_id && typeof p.wing_id === 'object') return p.wing_id.name;
+    return 'KKFA';
+  };
 
   const filteredPlayers = players.filter(p => {
     const matchesSearch = p.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const wingName = p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer');
+    const wingName = getWingName(p);
     const matchesWing = activeWing === 'All' || wingName.includes(activeWing);
     const matchesPosition = activePosition === 'All' || p.position === activePosition;
     return matchesSearch && matchesWing && matchesPosition;
@@ -63,7 +76,7 @@ const Players = () => {
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem', alignItems: 'center' }}>
             {/* Wing Filter */}
             <div style={{ display: 'flex', gap: '0.25rem', background: 'rgba(0,0,0,0.2)', padding: '0.25rem', borderRadius: '4px', border: '1px solid var(--border-light)' }}>
-              {['All', 'Kawoosa', 'Kunzer'].map((w) => (
+              {wings.map((w) => (
                 <button
                   key={w}
                   onClick={() => setActiveWing(w)}
@@ -90,15 +103,15 @@ const Players = () => {
         </div>
 
         {/* Kawoosa Section */}
-        {filteredPlayers.filter(p => (p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')).includes('Kawoosa')).length > 0 && (
+        {filteredPlayers.filter(p => getWingName(p).includes('Kawoosa')).length > 0 && (
           <div style={{ marginBottom: '4rem' }}>
             <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem', color: 'var(--primary)', letterSpacing: '0.1em' }}>
               KAWOOSA WING
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               <AnimatePresence mode="popLayout">
-                {filteredPlayers.filter(p => (p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')).includes('Kawoosa')).map((player) => (
-                  <PlayerCard key={player.id} player={player} />
+                {filteredPlayers.filter(p => getWingName(p).includes('Kawoosa')).map((player) => (
+                  <PlayerCard key={player._id} player={player} />
                 ))}
               </AnimatePresence>
             </div>
@@ -106,15 +119,15 @@ const Players = () => {
         )}
 
         {/* Kunzer Section */}
-        {filteredPlayers.filter(p => (p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')).includes('Kunzer')).length > 0 && (
+        {filteredPlayers.filter(p => getWingName(p).includes('Kunzer')).length > 0 && (
           <div style={{ marginBottom: '4rem' }}>
             <h2 style={{ fontSize: '1.5rem', marginBottom: '2rem', borderBottom: '1px solid var(--border-light)', paddingBottom: '1rem', color: 'white', letterSpacing: '0.1em' }}>
               KUNZER WING
             </h2>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(min(100%, 280px), 1fr))', gap: '2rem' }}>
               <AnimatePresence mode="popLayout">
-                {filteredPlayers.filter(p => (p.Wing ? p.Wing.name : (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')).includes('Kunzer')).map((player) => (
-                  <PlayerCard key={player.id} player={player} />
+                {filteredPlayers.filter(p => getWingName(p).includes('Kunzer')).map((player) => (
+                  <PlayerCard key={player._id} player={player} />
                 ))}
               </AnimatePresence>
             </div>

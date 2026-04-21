@@ -75,7 +75,7 @@ const Events = () => {
           <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '4rem 0' }}>No events found.</p>
         ) : (
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '2rem' }}>
-            {filtered.map(ev => <EventCard key={ev.id} event={ev} />)}
+            {filtered.map(ev => <EventCard key={ev._id} event={ev} />)}
           </div>
         )}
       </div>

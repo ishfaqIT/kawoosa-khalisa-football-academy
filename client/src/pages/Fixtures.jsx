@@ -92,7 +92,7 @@ const Fixtures = () => {
         ) : filtered.length === 0 ? (
           <p style={{ textAlign: 'center', color: 'var(--text-dim)', padding: '4rem 0' }}>No fixtures found.</p>
         ) : (
-          <div>{filtered.map(f => <FixtureRow key={f.id} fixture={f} />)}</div>
+          <div>{filtered.map(f => <FixtureRow key={f._id} fixture={f} />)}</div>
         )}
       </div>
     </div>

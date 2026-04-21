@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { User, Mail, Phone, MapPin, Calendar, ClipboardCheck, ArrowLeft, ArrowRight, Download, CheckCircle2 } from 'lucide-react';
 import { jsPDF } from 'jspdf';
-import API from '../api';
+import API, { fetchWings } from '../api';
 
 const Register = () => {
   const [step, setStep] = useState(1);
@@ -13,9 +13,21 @@ const Register = () => {
     fullName: '', dob: '', gender: 'Male',
     parentName: '', parentContact: '', email: '',
     address: '', school: '',
-    wing: 'Kawoosa', position: 'Forward',
+    wing_id: '', position: 'Forward',
     experience: '0', medicalNotes: ''
   });
+  const [wings, setWings] = useState([]);
+
+  React.useEffect(() => {
+    fetchWings().then(res => {
+      if (res.data.success) {
+        setWings(res.data.data);
+        if (res.data.data.length > 0) {
+          setFormData(prev => ({ ...prev, wing_id: res.data.data[0]._id }));
+        }
+      }
+    }).catch(console.error);
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -41,8 +53,7 @@ const Register = () => {
         position: formData.position,
         medical_history: formData.medicalNotes,
         terms_accepted: true,
-        // Map wing name to wing_id: 1=Kawoosa, 2=Kunzer
-        wing_id: formData.wing === 'Kawoosa' ? 1 : 2,
+        wing_id: formData.wing_id,
         status: 'Pending'
       };
       await API.post('/register', payload);
@@ -178,9 +189,10 @@ const Register = () => {
                 >
                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                       <label style={{ fontSize: '0.65rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'var(--text-dim)' }}>Wing Preference</label>
-                      <select name="wing" value={formData.wing} onChange={handleChange} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-light)', padding: '1rem', borderRadius: '4px', color: 'white', fontSize: '0.9rem', outline: 'none', transition: 'border-color 0.3s ease', appearance: 'none' }} onFocus={(e) => e.target.style.borderColor = 'var(--primary)'} onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}>
-                         <option value="Kawoosa" style={{ background: 'var(--bg-deep)' }}>Kawoosa Khalisa Wing</option>
-                         <option value="Kunzer" style={{ background: 'var(--bg-deep)' }}>Kunzer Wing</option>
+                      <select name="wing_id" value={formData.wing_id} onChange={handleChange} style={{ width: '100%', background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border-light)', padding: '1rem', borderRadius: '4px', color: 'white', fontSize: '0.9rem', outline: 'none', transition: 'border-color 0.3s ease', appearance: 'none' }} onFocus={(e) => e.target.style.borderColor = 'var(--primary)'} onBlur={(e) => e.target.style.borderColor = 'var(--border-light)'}>
+                         {wings.map(w => (
+                           <option key={w._id} value={w._id} style={{ background: 'var(--bg-deep)' }}>{w.name}</option>
+                         ))}
                       </select>
                    </div>
                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>

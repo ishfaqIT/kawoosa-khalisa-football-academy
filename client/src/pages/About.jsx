@@ -1,9 +1,17 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Target, Eye, Shield, Trophy, Users, MapPin } from 'lucide-react';
-
+import { Target, Eye, Shield, Trophy, MapPin } from 'lucide-react';
+import { fetchWings } from '../api';
 
 const About = () => {
+  const [wings, setWings] = useState([]);
+
+  useEffect(() => {
+    fetchWings().then(res => {
+      if (res.data.success) setWings(res.data.data);
+    }).catch(() => {});
+  }, []);
+
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -114,33 +122,19 @@ const About = () => {
             ACADEMY <span className="text-gradient">WINGS</span>
           </h2>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
-            {/* Kawoosa Wing */}
-            <div className="premium-card" style={{ padding: '3rem' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--primary)' }}>KAWOOSA KHALISA WING</h3>
-                <div style={{ padding: '0.75rem', background: 'rgba(0,255,135,0.1)', borderRadius: '50%', color: 'var(--primary)' }}><MapPin /></div>
+            {wings.map((wing, idx) => (
+              <div key={wing._id} className="premium-card" style={{ padding: '3rem', '--primary': idx % 2 === 0 ? 'var(--primary)' : 'var(--secondary)', '--primary-glow': idx % 2 === 0 ? 'var(--primary-glow)' : 'rgba(255,255,255,0.5)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
+                  <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: idx % 2 === 0 ? 'var(--primary)' : 'var(--secondary)' }}>{wing.name.toUpperCase()}</h3>
+                  <div style={{ padding: '0.75rem', background: idx % 2 === 0 ? 'rgba(0,255,135,0.1)' : 'rgba(255,255,255,0.1)', borderRadius: '50%', color: idx % 2 === 0 ? 'var(--primary)' : 'var(--secondary)' }}><MapPin /></div>
+                </div>
+                <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-dim)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Primary Ground</span> <span style={{ color: 'white' }}>{wing.ground || 'TBA'}</span></li>
+                  <li style={{ display: 'flex', justifyContent: 'space-between' }}><span>Founded</span> <span style={{ color: 'white' }}>{wing.founded || '2016'}</span></li>
+                  {wing.description && <li style={{ marginTop: '1rem', color: 'var(--text-muted)', fontSize: '0.65rem', textTransform: 'none', letterSpacing: 'normal' }}>{wing.description}</li>}
+                </ul>
               </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-dim)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Head Coach</span> <span style={{ color: 'white' }}>Mohammad Shafi</span></li>
-                <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Primary Ground</span> <span style={{ color: 'white' }}>KK Stadium</span></li>
-                <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Squad Size</span> <span style={{ color: 'white' }}>120+ Players</span></li>
-                <li style={{ display: 'flex', justifyContent: 'space-between' }}><span>Founded</span> <span style={{ color: 'white' }}>Mar 2016</span></li>
-              </ul>
-            </div>
-
-            {/* Kunzer Wing */}
-            <div className="premium-card" style={{ padding: '3rem', '--primary': 'var(--secondary)', '--primary-glow': 'rgba(255,255,255,0.5)' }}>
-               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
-                <h3 style={{ fontSize: '1.5rem', fontWeight: 900, color: 'var(--secondary)' }}>KUNZER WING</h3>
-                <div style={{ padding: '0.75rem', background: 'rgba(255,255,255,0.1)', borderRadius: '50%', color: 'var(--secondary)' }}><MapPin /></div>
-              </div>
-              <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: 'var(--text-dim)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: 700, display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-                <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Head Coach</span> <span style={{ color: 'white' }}>Bashrat Ahmad</span></li>
-                <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Primary Ground</span> <span style={{ color: 'white' }}>Kunzer Central Ground</span></li>
-                <li style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid var(--border-light)', paddingBottom: '0.75rem' }}><span>Squad Size</span> <span style={{ color: 'white' }}>80+ Players</span></li>
-                <li style={{ display: 'flex', justifyContent: 'space-between' }}><span>Founded</span> <span style={{ color: 'white' }}>Jun 2016</span></li>
-              </ul>
-            </div>
+            ))}
           </div>
         </div>
       </section>

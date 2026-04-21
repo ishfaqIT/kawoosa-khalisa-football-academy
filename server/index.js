@@ -8,6 +8,17 @@ require('dotenv').config();
 
 const { connectDB } = require('./config/db');
 
+// Register Models
+require('./models/Wing');
+require('./models/User');
+require('./models/Player');
+require('./models/Coach');
+require('./models/News');
+require('./models/Event');
+require('./models/Fixture');
+require('./models/Gallery');
+require('./models/Registration');
+
 const app = express();
 
 // Middleware
@@ -37,6 +48,8 @@ app.use('/api/gallery', require('./routes/galleryRoutes'));
 app.use('/api/register', require('./routes/registrationRoutes'));
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/wings', require('./routes/wingRoutes'));
+app.use('/api/stats', require('./routes/statsRoutes'));
 
 // Global Error Handler
 app.use((err, req, res, next) => {

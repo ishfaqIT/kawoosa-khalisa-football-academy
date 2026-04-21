@@ -62,4 +62,8 @@ export const fetchRegistrations = () => API.get('/register');
 export const updateRegistration = (id, data) => API.put(`/register/${id}`, data);
 export const deleteRegistration = (id) => API.delete(`/register/${id}`);
 
+// Wings
+export const fetchWings = () => API.get('/wings');
+export const fetchStats = () => API.get('/stats/counts');
+
 export default API;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { motion, useInView, useSpring, useTransform } from 'framer-motion';
+import { fetchStats } from '../../api';
 
-const Counter = ({ value, label }) => {
+const Counter = ({ value, label, suffix = "+" }) => {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true });
   const [count, setCount] = useState(0);
@@ -28,7 +29,7 @@ const Counter = ({ value, label }) => {
     <div ref={ref} className="stat-container">
       <motion.span className="stat-value">
         {count}
-        <span style={{ color: 'var(--primary)' }}>+</span>
+        <span style={{ color: 'var(--primary)' }}>{suffix}</span>
       </motion.span>
       <span className="stat-label">
         {label}
@@ -38,15 +39,23 @@ const Counter = ({ value, label }) => {
 };
 
 const AcademyStats = () => {
+  const [stats, setStats] = useState(null);
+
+  useEffect(() => {
+    fetchStats().then(res => {
+      if (res.data.success) setStats(res.data.data);
+    }).catch(() => {});
+  }, []);
+
   return (
     <section style={{ padding: '5rem 0', position: 'relative' }}>
       <div className="container grid-auto-fit">
-        <Counter value={250} label="Players Enrolled" />
-        <Counter value={18} label="Expert Coaches" />
-        <Counter value={120} label="Matches Played" />
-        <Counter value={12} label="Trophies Won" />
-        <Counter value={9} label="Years Active" />
-        <Counter value={450} label="Goals Scored" />
+        <Counter value={stats?.players || 250} label="Players Enrolled" />
+        <Counter value={stats?.coaches || 18} label="Expert Coaches" />
+        <Counter value={stats?.fixtures || 120} label="Matches Played" />
+        <Counter value={stats?.trophies || 12} label="Trophies Won" />
+        <Counter value={stats?.yearsActive || 8} label="Years Active" />
+        <Counter value={stats?.goalsScored || 450} label="Goals Scored" />
       </div>
     </section>
   );

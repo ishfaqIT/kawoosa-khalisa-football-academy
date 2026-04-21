@@ -75,7 +75,7 @@ const News = () => {
             {/* Grid */}
             {articles.length > 1 && (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(min(100%, 300px), 1fr))', gap: '2rem' }}>
-                {articles.slice(1).map(a => <NewsCard key={a.id} article={a} />)}
+                {articles.slice(1).map(a => <NewsCard key={a._id} article={a} />)}
               </div>
             )}
           </>

@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Users, UserCheck, Calendar, Newspaper, Image, ClipboardList,
   LayoutDashboard, LogOut, Plus, Trash2, CheckCircle, XCircle,
-  Activity, Menu, X, Upload, ChevronDown, ImageIcon, Link2
+  Activity, Menu, X, Upload, ChevronDown, ImageIcon, Link2, MapPin
 } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import useAcademyStore from '../../store/useAcademyStore';
@@ -15,19 +15,19 @@ import {
   fetchFixtures, createFixture, deleteFixture,
   fetchGallery, createGalleryItem, deleteGalleryItem,
   fetchRegistrations, updateRegistration, deleteRegistration,
-  uploadImage
+  fetchWings, uploadImage
 } from '../../api';
 
 // ─── Sidebar Config ──────────────────────────────────────────────────────────
 const NAV_ITEMS = [
-  { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { id: 'players', label: 'Players', icon: Users },
-  { id: 'coaches', label: 'Coaches', icon: UserCheck },
-  { id: 'news', label: 'News', icon: Newspaper },
-  { id: 'events', label: 'Events', icon: Calendar },
-  { id: 'fixtures', label: 'Fixtures', icon: Activity },
-  { id: 'gallery', label: 'Gallery', icon: Image },
-  { id: 'registrations', label: 'Registrations', icon: ClipboardList },
+  { _id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { _id: 'players', label: 'Players', icon: Users },
+  { _id: 'coaches', label: 'Coaches', icon: UserCheck },
+  { _id: 'news', label: 'News', icon: Newspaper },
+  { _id: 'events', label: 'Events', icon: Calendar },
+  { _id: 'fixtures', label: 'Fixtures', icon: Activity },
+  { _id: 'gallery', label: 'Gallery', icon: Image },
+  { _id: 'registrations', label: 'Registrations', icon: ClipboardList },
 ];
 
 // ─── Reusable UI ─────────────────────────────────────────────────────────────
@@ -139,8 +139,8 @@ const ImageUploader = ({ value, onChange, label = 'Image' }) => {
         {[{ id: 'upload', icon: Upload, txt: 'Upload File' }, { id: 'url', icon: Link2, txt: 'Paste URL' }].map(m => {
           const Icon = m.icon;
           return (
-            <button key={m.id} type="button" onClick={() => setMode(m.id)}
-              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.85rem', borderRadius: '6px', border: `1px solid ${mode === m.id ? '#39FF14' : 'rgba(255,255,255,0.12)'}`, background: mode === m.id ? 'rgba(57,255,20,0.1)' : 'transparent', color: mode === m.id ? '#39FF14' : '#7a9abf', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
+            <button key={m._id} type="button" onClick={() => setMode(m._id)}
+              style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.35rem 0.85rem', borderRadius: '6px', border: `1px solid ${mode === m._id ? '#39FF14' : 'rgba(255,255,255,0.12)'}`, background: mode === m._id ? 'rgba(57,255,20,0.1)' : 'transparent', color: mode === m._id ? '#39FF14' : '#7a9abf', fontSize: '0.72rem', fontWeight: 700, cursor: 'pointer', transition: 'all 0.15s' }}>
               <Icon size={13} /> {m.txt}
             </button>
           );
@@ -257,12 +257,14 @@ const DashboardSection = ({ stats }) => (
 );
 
 // ─── Players Section ──────────────────────────────────────────────────────────
-const PlayersSection = () => {
+const PlayersSection = ({ wings }) => {
   const [players, setPlayers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ name: '', position: 'Forward', jersey_no: '', wing_id: 1, bio: '', photo_url: '' });
+  const [form, setForm] = useState({ name: '', position: 'Forward', jersey_no: '', wing_id: wings[0]?._id || '', bio: '', photo_url: '' });
   const f = (k, v) => setForm(p => ({ ...p, [k]: v }));
+  
+  useEffect(() => { if (wings.length > 0 && !form.wing_id) f('wing_id', wings[0]._id); }, [wings]);
 
   const load = async () => { setLoading(true); try { const { data } = await fetchPlayers(); setPlayers(data.data || []); } catch {} setLoading(false); };
   useEffect(() => { load(); }, []);
@@ -279,14 +281,14 @@ const PlayersSection = () => {
         {loading ? <p style={{ padding: '2rem', color: '#7a9abf' }}>Loading...</p> : (
           <Table headers={['#', 'Photo', 'Name', 'Position', 'Wing', 'Jersey', 'Actions']}>
             {players.map((p, i) => (
-              <tr key={p.id}>
+              <tr key={p._id}>
                 <Td>{i + 1}</Td>
                 <Td><img src={p.photo_url || 'https://via.placeholder.com/40'} alt={p.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(57,255,20,0.3)' }} onError={e => e.currentTarget.src = 'https://via.placeholder.com/40'} /></Td>
                 <Td style={{ color: 'white', fontWeight: 700 }}>{p.name}</Td>
                 <Td>{p.position}</Td>
-                <Td>{p.Wing?.name || (p.wing_id === 1 ? 'Kawoosa' : 'Kunzer')}</Td>
+                <Td>{p.wing_id?.name || '—'}</Td>
                 <Td>#{p.jersey_no}</Td>
-                <Td><ActionBtn onClick={() => handleDelete(p.id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
+                <Td><ActionBtn onClick={() => handleDelete(p._id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
               </tr>
             ))}
           </Table>
@@ -300,7 +302,7 @@ const PlayersSection = () => {
               <StyledSelect value={form.position} onChange={e => f('position', e.target.value)} options={['Forward', 'Midfielder', 'Defender', 'Goalkeeper']} />
             </Field>
             <Field label="Wing">
-              <StyledSelect value={form.wing_id} onChange={e => f('wing_id', Number(e.target.value))} options={[{ value: 1, label: 'Kawoosa Wing' }, { value: 2, label: 'Kunzer Wing' }]} />
+              <StyledSelect value={form.wing_id} onChange={e => f('wing_id', e.target.value)} options={wings.map(w => ({ value: w._id, label: w.name }))} />
             </Field>
             <Field label="Jersey No"><input style={ss.input} type="number" value={form.jersey_no} onChange={e => f('jersey_no', e.target.value)} placeholder="e.g. 10" /></Field>
             <ImageUploader value={form.photo_url} onChange={e => f('photo_url', e.target.value)} />
@@ -314,16 +316,18 @@ const PlayersSection = () => {
 };
 
 // ─── Coaches Section ──────────────────────────────────────────────────────────
-const CoachesSection = () => {
+const CoachesSection = ({ wings }) => {
   const [coaches, setCoaches] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [form, setForm] = useState({ name: '', role: 'Head Coach', wing_id: 1, experience_yrs: '', qualifications: '', bio: '', photo_url: '' });
+  const [form, setForm] = useState({ name: '', role: 'Head Coach', wing_id: wings[0]?._id || '', experience_yrs: '', qualifications: '', bio: '', photo_url: '' });
   const f = (k, v) => setForm(p => ({ ...p, [k]: v }));
+
+  useEffect(() => { if (wings.length > 0 && !form.wing_id) f('wing_id', wings[0]._id); }, [wings]);
 
   const load = async () => { setLoading(true); try { const { data } = await fetchCoaches(); setCoaches(data.data || []); } catch {} setLoading(false); };
   useEffect(() => { load(); }, []);
-  const handleCreate = async (e) => { e.preventDefault(); await createCoach(form); setShowModal(false); setForm({ name: '', role: 'Head Coach', wing_id: 1, experience_yrs: '', qualifications: '', bio: '', photo_url: '' }); load(); };
+  const handleCreate = async (e) => { e.preventDefault(); await createCoach(form); setShowModal(false); setForm({ name: '', role: 'Head Coach', wing_id: wings[0]?._id || '', experience_yrs: '', qualifications: '', bio: '', photo_url: '' }); load(); };
   const handleDelete = async (id) => { if (window.confirm('Delete coach?')) { await deleteCoach(id); load(); } };
 
   return (
@@ -336,13 +340,13 @@ const CoachesSection = () => {
         {loading ? <p style={{ padding: '2rem', color: '#7a9abf' }}>Loading...</p> : (
           <Table headers={['Photo', 'Name', 'Role', 'Wing', 'Exp', 'Actions']}>
             {coaches.map(c => (
-              <tr key={c.id}>
+              <tr key={c._id}>
                 <Td><img src={c.photo_url || 'https://via.placeholder.com/40'} alt={c.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(57,255,20,0.3)' }} onError={e => e.currentTarget.src = 'https://via.placeholder.com/40'} /></Td>
                 <Td style={{ color: 'white', fontWeight: 700 }}>{c.name}</Td>
                 <Td>{c.role}</Td>
-                <Td>{c.Wing?.name || (c.wing_id === 1 ? 'Kawoosa' : 'Kunzer')}</Td>
+                <Td>{c.wing_id?.name || '—'}</Td>
                 <Td>{c.experience_yrs ? `${c.experience_yrs} yrs` : '—'}</Td>
-                <Td><ActionBtn onClick={() => handleDelete(c.id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
+                <Td><ActionBtn onClick={() => handleDelete(c._id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
               </tr>
             ))}
           </Table>
@@ -356,7 +360,7 @@ const CoachesSection = () => {
               <StyledSelect value={form.role} onChange={e => f('role', e.target.value)} options={['Head Coach', 'Assistant Coach', 'Goalkeeper Coach', 'Fitness Trainer', 'Scout']} />
             </Field>
             <Field label="Wing">
-              <StyledSelect value={form.wing_id} onChange={e => f('wing_id', Number(e.target.value))} options={[{ value: 1, label: 'Kawoosa Wing' }, { value: 2, label: 'Kunzer Wing' }]} />
+              <StyledSelect value={form.wing_id} onChange={e => f('wing_id', e.target.value)} options={wings.map(w => ({ value: w._id, label: w.name }))} />
             </Field>
             <Field label="Experience (Years)"><input style={ss.input} type="number" value={form.experience_yrs} onChange={e => f('experience_yrs', e.target.value)} placeholder="e.g. 8" /></Field>
             <Field label="Qualifications"><input style={ss.input} value={form.qualifications} onChange={e => f('qualifications', e.target.value)} placeholder="e.g. UEFA B License" /></Field>
@@ -391,13 +395,13 @@ const NewsSection = () => {
       <div style={{ background: 'linear-gradient(145deg, rgba(10,31,68,0.9), rgba(5,15,34,0.9))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
         <Table headers={['Image', 'Title', 'Author', 'Status', 'Date', 'Actions']}>
           {items.map(n => (
-            <tr key={n.id}>
+            <tr key={n._id}>
               <Td>{n.image_url && <img src={n.image_url} alt="" style={{ width: '48px', height: '32px', objectFit: 'cover', borderRadius: '6px' }} />}</Td>
               <Td style={{ color: 'white', fontWeight: 700, maxWidth: '240px' }}>{n.title}</Td>
               <Td>{n.author}</Td>
               <Td><Badge status={n.status} /></Td>
               <Td>{new Date(n.createdAt).toLocaleDateString()}</Td>
-              <Td><ActionBtn onClick={() => handleDelete(n.id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
+              <Td><ActionBtn onClick={() => handleDelete(n._id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
             </tr>
           ))}
         </Table>
@@ -442,12 +446,12 @@ const EventsSection = () => {
       <div style={{ background: 'linear-gradient(145deg, rgba(10,31,68,0.9), rgba(5,15,34,0.9))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
         <Table headers={['Title', 'Type', 'Date', 'Location', 'Actions']}>
           {items.map(ev => (
-            <tr key={ev.id}>
+            <tr key={ev._id}>
               <Td style={{ color: 'white', fontWeight: 700 }}>{ev.title}</Td>
               <Td><Badge status={ev.type} /></Td>
               <Td>{new Date(ev.event_date).toLocaleDateString()}</Td>
               <Td>{ev.location}</Td>
-              <Td><ActionBtn onClick={() => handleDelete(ev.id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
+              <Td><ActionBtn onClick={() => handleDelete(ev._id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
             </tr>
           ))}
         </Table>
@@ -492,14 +496,14 @@ const FixturesSection = () => {
       <div style={{ background: 'linear-gradient(145deg, rgba(10,31,68,0.9), rgba(5,15,34,0.9))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
         <Table headers={['Home', 'Away', 'Score', 'Competition', 'Date', 'Status', 'Actions']}>
           {items.map(fi => (
-            <tr key={fi.id}>
+            <tr key={fi._id}>
               <Td style={{ color: '#39FF14', fontWeight: 700 }}>{fi.home_team}</Td>
               <Td>{fi.away_team}</Td>
               <Td style={{ color: 'white', fontWeight: 800, letterSpacing: '0.05em' }}>{fi.home_score != null ? `${fi.home_score} – ${fi.away_score}` : '—'}</Td>
               <Td>{fi.competition || '—'}</Td>
               <Td>{new Date(fi.match_date).toLocaleDateString()}</Td>
               <Td><Badge status={fi.status} /></Td>
-              <Td><ActionBtn onClick={() => handleDelete(fi.id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
+              <Td><ActionBtn onClick={() => handleDelete(fi._id)} color="#ef4444" icon={Trash2} title="Delete" /></Td>
             </tr>
           ))}
         </Table>
@@ -547,10 +551,10 @@ const GallerySection = () => {
       </div>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: '1rem' }}>
         {items.map(img => (
-          <div key={img.id} style={{ background: 'linear-gradient(145deg, rgba(10,31,68,0.9), rgba(5,15,34,0.9))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', overflow: 'hidden' }}>
+          <div key={img._id} style={{ background: 'linear-gradient(145deg, rgba(10,31,68,0.9), rgba(5,15,34,0.9))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '12px', overflow: 'hidden' }}>
             <div style={{ position: 'relative' }}>
               <img src={img.image_url} alt={img.title} style={{ width: '100%', height: '140px', objectFit: 'cover', display: 'block' }} onError={e => e.currentTarget.style.background = '#0d2347'} />
-              <button onClick={() => handleDelete(img.id)} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: 'white', display: 'flex' }}><Trash2 size={13} /></button>
+              <button onClick={() => handleDelete(img._id)} style={{ position: 'absolute', top: '0.5rem', right: '0.5rem', background: 'rgba(239,68,68,0.85)', border: 'none', borderRadius: '6px', padding: '0.3rem', cursor: 'pointer', color: 'white', display: 'flex' }}><Trash2 size={13} /></button>
             </div>
             <div style={{ padding: '0.75rem' }}>
               <p style={{ fontSize: '0.8rem', fontWeight: 700, color: 'white', marginBottom: '0.2rem' }}>{img.title || '—'}</p>
@@ -591,18 +595,18 @@ const RegistrationsSection = () => {
       <div style={{ background: 'linear-gradient(145deg, rgba(10,31,68,0.9), rgba(5,15,34,0.9))', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '14px', overflow: 'hidden' }}>
         <Table headers={['Player', 'Parent', 'Phone', 'Wing', 'Position', 'Status', 'Actions']}>
           {items.map(r => (
-            <tr key={r.id}>
+            <tr key={r._id}>
               <Td style={{ color: 'white', fontWeight: 700 }}>{r.player_name}</Td>
               <Td>{r.parent_name}</Td>
               <Td>{r.phone}</Td>
-              <Td>{r.Wing?.name || '—'}</Td>
+              <Td>{r.wing_id?.name || '—'}</Td>
               <Td>{r.position || '—'}</Td>
               <Td><Badge status={r.status} /></Td>
               <Td>
                 <div style={{ display: 'flex', gap: '0.25rem' }}>
-                  <ActionBtn onClick={() => handleStatus(r.id, 'Approved')} color="#39FF14" icon={CheckCircle} title="Approve" />
-                  <ActionBtn onClick={() => handleStatus(r.id, 'Rejected')} color="#ef4444" icon={XCircle} title="Reject" />
-                  <ActionBtn onClick={() => handleDelete(r.id)} color="#6b7280" icon={Trash2} title="Delete" />
+                  <ActionBtn onClick={() => handleStatus(r._id, 'Approved')} color="#39FF14" icon={CheckCircle} title="Approve" />
+                  <ActionBtn onClick={() => handleStatus(r._id, 'Rejected')} color="#ef4444" icon={XCircle} title="Reject" />
+                  <ActionBtn onClick={() => handleDelete(r._id)} color="#6b7280" icon={Trash2} title="Delete" />
                 </div>
               </Td>
             </tr>
@@ -627,10 +631,10 @@ const AdminSidebar = ({ active, setActive, setSidebarOpen, user, logout }) => (
     </div>
     <nav style={{ display: 'flex', flexDirection: 'column', gap: '0.2rem', flex: 1 }}>
       {NAV_ITEMS.map(item => {
-        const isActive = active === item.id;
+        const isActive = active === item._id;
         const Icon = item.icon;
         return (
-          <button key={item.id} onClick={() => { setActive(item.id); setSidebarOpen(false); }}
+          <button key={item._id} onClick={() => { setActive(item._id); setSidebarOpen(false); }}
             style={{ display: 'flex', alignItems: 'center', gap: '0.7rem', padding: '0.7rem 0.85rem', borderRadius: '10px', border: 'none', cursor: 'pointer', background: isActive ? '#39FF14' : 'transparent', color: isActive ? '#0A1F44' : '#a8bfd6', fontWeight: isActive ? 800 : 500, fontSize: '0.85rem', width: '100%', textAlign: 'left', transition: 'all 0.15s' }}
             onMouseEnter={e => { if (!isActive) e.currentTarget.style.background = 'rgba(57,255,20,0.08)'; }}
             onMouseLeave={e => { if (!isActive) e.currentTarget.style.background = 'transparent'; }}>
@@ -657,19 +661,24 @@ const AdminDashboard = () => {
   const [active, setActive] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [stats, setStats] = useState([]);
+  const [wings, setWings] = useState([]);
   const { user, logout } = useAcademyStore();
 
   useEffect(() => {
     (async () => {
       try {
-        const [pl, co, nw, ev, fx] = await Promise.all([fetchPlayers(), fetchCoaches(), fetchNews(), fetchEvents(), fetchFixtures()]);
+        const [pl, co, nw, ev, fx, wg] = await Promise.all([
+          fetchPlayers(), fetchCoaches(), fetchNews(), fetchEvents(), fetchFixtures(), fetchWings()
+        ]);
         setStats([
           { label: 'Players', value: pl.data.data?.length ?? 0, icon: Users },
           { label: 'Coaches', value: co.data.data?.length ?? 0, icon: UserCheck },
           { label: 'News', value: nw.data.data?.length ?? 0, icon: Newspaper },
           { label: 'Events', value: ev.data.data?.length ?? 0, icon: Calendar },
           { label: 'Fixtures', value: fx.data.data?.length ?? 0, icon: Activity },
+          { label: 'Wings', value: wg.data.data?.length ?? 0, icon: MapPin },
         ]);
+        setWings(wg.data.data || []);
       } catch {}
     })();
   }, []);
@@ -678,8 +687,8 @@ const AdminDashboard = () => {
   const renderSection = () => {
     switch (active) {
       case 'dashboard':    return <DashboardSection stats={stats} />;
-      case 'players':      return <PlayersSection />;
-      case 'coaches':      return <CoachesSection />;
+      case 'players':      return <PlayersSection wings={wings} />;
+      case 'coaches':      return <CoachesSection wings={wings} />;
       case 'news':         return <NewsSection />;
       case 'events':       return <EventsSection />;
       case 'fixtures':     return <FixturesSection />;
@@ -717,7 +726,7 @@ const AdminDashboard = () => {
           <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem' }}>
             <button className="admin-menu-toggle" onClick={() => setSidebarOpen(true)} style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.1)', color: 'white', cursor: 'pointer', borderRadius: '8px', padding: '0.45rem', display: 'none', alignItems: 'center' }}><Menu size={20} /></button>
             <h1 style={{ fontWeight: 800, fontSize: '1rem', textTransform: 'uppercase', letterSpacing: '0.05em', color: 'white' }}>
-              {NAV_ITEMS.find(n => n.id === active)?.label || 'Dashboard'}
+              {NAV_ITEMS.find(n => n._id === active)?.label || 'Dashboard'}
             </h1>
           </div>
           <span style={{ fontSize: '0.75rem', color: '#7a9abf' }}>Welcome, <strong style={{ color: '#39FF14' }}>{user?.name}</strong></span>

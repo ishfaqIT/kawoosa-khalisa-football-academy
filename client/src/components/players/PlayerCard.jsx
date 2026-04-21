@@ -40,7 +40,7 @@ const PlayerCard = ({ player }) => {
             {player.position}
           </span>
           <span style={{ padding: '0.25rem 0.5rem', background: 'rgba(255,255,255,0.1)', color: 'white', fontSize: '0.55rem', fontWeight: 900, textTransform: 'uppercase', letterSpacing: '0.1em', borderRadius: '2px' }}>
-            {player.Wing ? (player.Wing.name.includes('Kawoosa') ? 'Kawoosa' : 'Kunzer') : (player.wing_id === 1 ? 'Kawoosa' : 'Kunzer')}
+            {player.wing_id?.name?.includes('Kawoosa') ? 'Kawoosa' : (player.wing_id?.name?.includes('Kunzer') ? 'Kunzer' : 'KKFA')}
           </span>
         </div>
         <h3 style={{ fontSize: '1.5rem', fontWeight: 900, marginBottom: '1rem', textTransform: 'uppercase', letterSpacing: '-0.02em', lineHeight: 1.1 }}>
