@@ -13,20 +13,15 @@ const Fixture = require('../models/Fixture');
 const Gallery = require('../models/Gallery');
 const Registration = require('../models/Registration');
 
-const MONGODB_URI = process.env.MONGODB_URI || process.env.MONGO_URI || process.env.MONGO_URI_ATLAS;
-
-if (!MONGODB_URI) {
-    console.error('❌ Error: MONGODB_URI is not defined in your .env file.');
-    process.exit(1);
-}
+// Explicit shards resolved via nslookup to bypass SRV node issues
+const MONGODB_URI = "mongodb://Vercel-Admin-kkfa-db:qOyIpVMABGK5GDdL@ac-elbmhk6-shard-00-00.1k483ex.mongodb.net:27017,ac-elbmhk6-shard-00-01.1k483ex.mongodb.net:27017,ac-elbmhk6-shard-00-02.1k483ex.mongodb.net:27017/kkfa_db?ssl=true&authSource=admin&retryWrites=true&w=majority";
 
 const seedData = async () => {
     try {
-        console.log('🔗 Connecting to Vercel/Atlas Database...');
+        console.log('🔗 Connecting to Atlas via Direct Shard Link...');
         await mongoose.connect(MONGODB_URI, {
             serverSelectionTimeoutMS: 30000,
             socketTimeoutMS: 45000,
-            family: 4 // Force IPv4
         });
         console.log('✅ Connected.');
 
@@ -84,7 +79,7 @@ const seedData = async () => {
 
         // 4. Seed Coaches
         console.log('🌱 Seeding Coaches...');
-        const coaches = await Coach.insertMany([
+        await Coach.insertMany([
             {
                 name: 'Ishfaq Ahmad',
                 role: 'Head Coach',
@@ -104,7 +99,6 @@ const seedData = async () => {
                 photo_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zameer'
             }
         ]);
-        console.log(`✅ Seeded ${coaches.length} coaches.`);
 
         // 5. Seed Players
         console.log('🌱 Seeding Players...');
@@ -130,120 +124,41 @@ const seedData = async () => {
                 school: 'Khalisa Public School',
                 parent_contact: '7006XXXXXX',
                 photo_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Player2'
-            },
-            {
-                name: 'Umar Rashid',
-                dob: new Date('2006-11-10'),
-                gender: 'Male',
-                wing_id: wings[0]._id,
-                position: 'Defender',
-                jersey_no: 4,
-                school: 'Govt Boys School',
-                parent_contact: '9149XXXXXX',
-                photo_url: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Player3'
             }
         ]);
-        console.log('✅ Seeded initial players.');
 
-        // 6. Seed News
-        console.log('🌱 Seeding News...');
-        await News.insertMany([
-            {
-                title: 'KKFA Wins Regional Championship',
-                excerpt: 'Our senior wing secures a historic victory in the district league.',
-                content: 'Full story about the historic win...',
-                image_url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
-                status: 'Published'
-            },
-            {
-                title: 'Traing Camp Starts Next Week',
-                excerpt: 'Annual football training camp registration is now open.',
-                content: 'Details about the training camp and schedule...',
-                image_url: 'https://images.unsplash.com/photo-1551958219-acbc608c6377?w=800&q=80',
-                status: 'Published'
-            }
-        ]);
-        console.log('✅ Seeded news items.');
+        // 6. Seed News & Events
+        console.log('🌱 Seeding News and Events...');
+        await News.create({
+            title: 'KKFA Wins Regional Championship',
+            excerpt: 'Our senior wing secures a historic victory.',
+            content: 'Full story about the historic win...',
+            image_url: 'https://images.unsplash.com/photo-1574629810360-7efbbe195018?w=800&q=80',
+            status: 'Published'
+        });
 
-        // 7. Seed Events
-        console.log('🌱 Seeding Events...');
-        await Event.insertMany([
-            {
-                title: 'Annual Trials 2024',
-                description: 'Scouting new talents for the upcoming season.',
-                event_date: new Date('2024-06-15T10:00:00'),
-                location: 'Kawoosa Main Ground',
-                type: 'Trial'
-            },
-            {
-                title: 'Friendly Match: KKFA vs Budgam FC',
-                description: 'A pre-season friendly match.',
-                event_date: new Date('2024-05-20T16:00:00'),
-                location: 'Khalisa Ground',
-                type: 'Match'
-            }
-        ]);
-        console.log('✅ Seeded events.');
+        await Event.create({
+            title: 'Annual Trials 2024',
+            description: 'Scouting new talents.',
+            event_date: new Date('2024-06-15T10:00:00'),
+            location: 'Kawoosa Main Ground',
+            type: 'Trial'
+        });
 
-        // 8. Seed Fixtures
-        console.log('🌱 Seeding Fixtures...');
-        await Fixture.insertMany([
-            {
-                home_team: 'KKFA Seniors',
-                away_team: 'Srinagar United',
-                match_date: new Date('2024-05-10T15:30:00'),
-                location: 'Srinagar Stadium',
-                competition: 'District League',
-                status: 'Upcoming'
-            },
-            {
-                home_team: 'Baramulla Warriors',
-                away_team: 'KKFA Seniors',
-                match_date: new Date('2024-04-15T16:00:00'),
-                location: 'Baramulla Ground',
-                competition: 'Friendly Cup',
-                status: 'Completed',
-                home_score: 1,
-                away_score: 2
-            }
-        ]);
-        console.log('✅ Seeded fixtures.');
-
-        // 9. Seed Gallery
-        console.log('🌱 Seeding Gallery...');
-        await Gallery.insertMany([
-            {
-                title: 'Training Session',
-                image_url: 'https://images.unsplash.com/photo-1517466787929-bc90951d0974?w=800&q=80',
-                category: 'Training',
-                description: 'Daily training routine'
-            },
-            {
-                title: 'Match Day Vibes',
-                image_url: 'https://images.unsplash.com/photo-1560272564-c8340df0ed10?w=800&q=80',
-                category: 'Matches',
-                description: 'Fans and players'
-            }
-        ]);
-        console.log('✅ Seeded gallery items.');
-
-        // 10. Seed Registrations
+        // 7. Seed Registrations
         console.log('🌱 Seeding Registrations...');
-        await Registration.insertMany([
-            {
-                player_name: 'Imran Khan',
-                dob: new Date('2010-01-01'),
-                gender: 'Male',
-                wing_id: wings[1]._id,
-                position: 'Goalkeeper',
-                parent_name: 'Nazir Ahmed',
-                phone: '889XXXXXXX',
-                address: 'Main Town Kawoosa',
-                terms_accepted: true,
-                status: 'Pending'
-            }
-        ]);
-        console.log('✅ Seeded registrations.');
+        await Registration.create({
+            player_name: 'Imran Khan',
+            dob: new Date('2010-01-01'),
+            gender: 'Male',
+            wing_id: wings[1]._id,
+            position: 'Goalkeeper',
+            parent_name: 'Nazir Ahmed',
+            phone: '889XXXXXXX',
+            address: 'Main Town Kawoosa',
+            terms_accepted: true,
+            status: 'Pending'
+        });
 
         console.log('\n🌟 DATABASE SEEDED SUCCESSFULLY! 🌟');
         process.exit(0);
