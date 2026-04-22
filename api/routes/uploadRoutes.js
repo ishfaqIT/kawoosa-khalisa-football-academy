@@ -32,7 +32,9 @@ const upload = multer({
 router.post('/', upload.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, error: 'No file uploaded' });
 
-  const imageUrl = `http://localhost:5000/uploads/${req.file.filename}`;
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const imageUrl = `${protocol}://${host}/uploads/${req.file.filename}`;
   res.json({ success: true, url: imageUrl, filename: req.file.filename });
 });
 
